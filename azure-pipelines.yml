@@ -33,12 +33,19 @@ jobs:
         pip3 install wheel
         pip3 install pytest
         pip3 install delocate
+        pip3 install cibuildwheel
       displayName: Prepare python (cython, wheel, delocate)
 
     - script: |
-        python3 -m pip install --upgrade pip
-        pip3 install cython
-        pip3 install wheel
+        python3.9 -m cython --cplus --fast-fail --annotate plyvel/_plyvel.pyx
+        python3.9 ./setup.py build_ext
+        CIBW_BUILD='cp3*-macosx_x86_64' \
+        CIBW_PLATFORM=macos \
+        cibuildwheel --output-dir wheelhouse .
+      displayName: Build plyvel wheel (cibuildhweel)
+      continueOnError: true
+
+    - script: |
         python3.9 -m cython --cplus --fast-fail --annotate plyvel/_plyvel.pyx
         python3.9 ./setup.py build_ext
         python3.9 ./setup.py bdist_wheel
@@ -61,7 +68,13 @@ jobs:
       inputs:
         artifactName: 'MacOS'
         pathtoPublish: 'fixed_wheels'
-      displayName: Build wheel MacOS
+      displayName: Publish wheel MacOS
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        artifactName: 'MacOS'
+        pathtoPublish: 'wheelhouse'
+      displayName: Publish wheel MacOS (cibuildwheel)
 
 - job: BuildWindows
   pool: {vmImage: 'windows-latest'}
@@ -116,7 +129,7 @@ jobs:
       inputs:
         artifactName: 'Windows'
         pathtoPublish: 'dist'
-      displayName: Build wheel Windows
+      displayName: Publish wheel Windows
 
 - job: BuildLinux
   pool:
@@ -157,4 +170,4 @@ jobs:
       inputs:
         artifactName: 'Linux'
         pathtoPublish: 'dist'
-      displayName: Build wheel linux
+      displayName: Publish wheel linux

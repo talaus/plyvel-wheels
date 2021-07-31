@@ -11,7 +11,7 @@ trigger:
 
 jobs:
 - job: BuildMacOS
-  pool: {vmImage: 'macOS-10.15'}
+  pool: {vmImage: 'macOS-10.14'}
 
   variables:
     leveldbVersion: 1.22
@@ -37,12 +37,11 @@ jobs:
       displayName: Prepare python (cython, wheel, delocate)
 
     - script: |
-        python3.9 -m cython --cplus --fast-fail --annotate plyvel/_plyvel.pyx
-        python3.9 ./setup.py build_ext
+        CIBW_BEFORE_BUILD='echo $(python --version) && python -m pip install cython && python -m cython --cplus --fast-fail --annotate plyvel/_plyvel.pyx && python ./setup.py build_ext' \
         CIBW_BUILD='cp3*-macosx_x86_64' \
         CIBW_PLATFORM=macos \
         cibuildwheel --output-dir wheelhouse .
-      displayName: Build plyvel wheel (cibuildhweel)
+      displayName: Build plyvel wheel (cibuildwheel)
       continueOnError: true
 
     - script: |

@@ -10,6 +10,59 @@ trigger:
 
 
 jobs:
+- job: BuildMacOS
+  pool: {vmImage: 'macOS-10.15'}
+
+  variables:
+    leveldbVersion: 1.22
+
+  steps:
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: 3.9
+
+    - script: |
+        brew tap bagonyi/homebrew-formulae git@github.com:bagonyi/homebrew-formulae.git
+        brew extract --version=$(leveldbVersion) leveldb bagonyi/formulae
+        brew install leveldb@$(leveldbVersion)
+      displayName: Install leveldb 1.22
+
+    - script: |
+        python3 -m pip install --upgrade pip
+        pip3 install cython
+        pip3 install wheel
+        pip3 install pytest
+        pip3 install delocate
+      displayName: Prepare python (cython, wheel, delocate)
+
+    - script: |
+        python3 -m pip install --upgrade pip
+        pip3 install cython
+        pip3 install wheel
+        python3.9 -m cython --cplus --fast-fail --annotate plyvel/_plyvel.pyx
+        python3.9 ./setup.py build_ext
+        python3.9 ./setup.py bdist_wheel
+      displayName: Build plyvel wheel
+
+    - script: |
+        delocate-wheel -w fixed_wheels -v ./dist/plyvel_wheels-1.3.0-cp39-cp39-macosx_10_14_x86_64.whl
+      displayName: Add leveldb lib and statically link
+
+    # NOTE: removal of the local plyvel directory is so that it doesn't interfere with import paths
+    # from site-packages when running tests
+    - script: |
+        python3.9 -m pip install fixed_wheels/plyvel_wheels-1.3.0-cp39-cp39-macosx_10_14_x86_64.whl
+        rm -r plyvel
+        pytest test
+      displayName: Install from wheel and test
+      continueOnError: true
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        artifactName: 'MacOS'
+        pathtoPublish: 'fixed_wheels'
+      displayName: Build wheel MacOS
+
 - job: BuildWindows
   pool: {vmImage: 'windows-latest'}
 

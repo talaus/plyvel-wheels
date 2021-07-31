@@ -16,11 +16,22 @@ jobs:
   variables:
     VCPKG_LEVELDB_INCLUDE_PATH: C:\vcpkg\packages\leveldb_x64-windows\include\
     VCPKG_LEVELDB_LIB_PATH: C:\vcpkg\packages\leveldb_x64-windows\lib\
+    vcpkgVersion: 2020.06.15
+    vcpkgInstallParamPath: '$(Build.SourcesDirectory)\.azure-pipelines\vcpkg'
+    vcpkgBinariesPath: 'C:\Users\VssAdministrator\AppData\Local\vcpkg\archives'
+    vcpkg.arch: 'x64'
 
   steps:
     - task: UsePythonVersion@0
       inputs:
         versionSpec: 3.9
+
+    # If additional packages are added you should add them to the 'key' to create a new cache entry
+    - task: Cache@2
+      displayName: Cache vcpkg
+      inputs:
+        key: leveldb:x64-windows | "$(vcpkg.arch)" | "$(vcpkgVersion)" | "$(Agent.OS)"
+        path: '$(vcpkgBinariesPath)'
 
     - pwsh: |
         vcpkg install leveldb:x64-windows

@@ -11,7 +11,7 @@ trigger:
 
 jobs:
 - job: BuildMacOS
-  pool: {vmImage: 'macOS-10.14'}
+  pool: {vmImage: 'macOS-10.15'}
 
   variables:
     leveldbVersion: 1.22

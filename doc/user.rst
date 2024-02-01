@@ -15,7 +15,7 @@ This user guide gives an overview of Plyvel. It covers:
 Note: this document assumes basic familiarity with LevelDB; visit the `LevelDB
 homepage`_ for more information about its features and design.
 
-.. _`LevelDB homepage`: http://code.google.com/p/leveldb/
+.. _`LevelDB homepage`: https://github.com/google/leveldb
 
 
 Getting started
@@ -33,7 +33,7 @@ That's all there is to it. At this point ``/tmp/testdb/`` contains a fresh
 LevelDB database (assuming the directory did not contain a LevelDB database
 already).
 
-For real world applications, you probably want to tweak things like the size of
+For real-world applications, you probably want to tweak things like the size of
 the memory cache and the number of bits to use for the (optional) bloom filter.
 These settings, and many others, can be specified as arguments to the
 :py:class:`DB` constructor. For this tutorial we'll just use the LevelDB
@@ -47,6 +47,13 @@ To close the database we just opened, use :py:meth:`DB.close` and inspect the
     >>> db.close()
     >>> db.closed
     True
+
+:py:class:`DB` instances can also be used as context managers, which
+will cause the database to close itself at the end of the ``with``
+block::
+
+    with plyvel.DB('/tmp/testdb/') as db:
+        ...
 
 Alternatively, you can just delete the variable that points to it, but this
 might not close the database immediately, e.g. because active iterators are

@@ -4,7 +4,7 @@ Plyvel
 
 **Plyvel** is a fast and feature-rich Python interface to LevelDB_.
 
-.. _LevelDB: http://code.google.com/p/leveldb/
+.. _LevelDB: https://github.com/google/leveldb
 
 Plyvel's key features are:
 
@@ -25,7 +25,7 @@ Plyvel's key features are:
 * **High performance**
 
   Plyvel executes all performance-critical code at C speed (using Cython_),
-  which means Plyvel is a good fit for high performance applications.
+  which means Plyvel is a good fit for high-performance applications.
 
   .. _Cython: http://cython.org/
 

@@ -27,13 +27,18 @@ LevelDB database.
 
       Open the underlying database handle.
 
-      Most arguments have the same name as the the corresponding LevelDB
+      Most arguments have the same name as the corresponding LevelDB
       parameters; see the LevelDB documentation for a detailed description.
       Arguments defaulting to `None` are only propagated to LevelDB if
       specified, e.g. not specifying a `write_buffer_size` means the LevelDB
       defaults are used.
 
       Most arguments are optional; only the database name is required.
+
+      Instances of this class can be used as context managers
+      (Python's ``with`` block). When the ``with`` block terminates,
+      the database automatically closes without an explicit call to
+      :py:meth:`DB.close`.
 
       See the descriptions for :cpp:class:`DB`, :cpp:func:`DB::Open`,
       :cpp:class:`Cache`, :cpp:class:`FilterPolicy`, and :cpp:class:`Comparator`
@@ -56,7 +61,7 @@ LevelDB database.
                                          encoding of keys
       :param bool max_file_size: maximum file size (in bytes)
       :param bool compression: whether to use Snappy compression (enabled by default))
-      :param int bloom_filter_bits: the number of bits to use for a bloom
+      :param int bloom_filter_bits: the number of bits to use per key for a bloom
                                     filter; the default of 0 means that no bloom
                                     filter will be used
       :param callable comparator: a custom comparator callable that takes two
@@ -168,7 +173,7 @@ LevelDB database.
       * `include_start` and `include_stop` are only used if `start` and `stop`
         are specified.
 
-      Note: due to the whay the `prefix` support is implemented, this feature
+      Note: due to the way the `prefix` support is implemented, this feature
       only works reliably when the default DB comparator is used.
 
       See the :py:class:`Iterator` API for more information about iterators.
